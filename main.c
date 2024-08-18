@@ -1,5 +1,6 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
@@ -13,7 +14,8 @@
 #define CAR_H 100
 #define OBSTACLE_W 50
 #define OBSTACLE_H 100
-#define SPEED 15
+float SPEED = 5;
+
 
 typedef struct {
     float x, y;
@@ -173,21 +175,27 @@ int main(int argc, char **argv) {
     load_scores(&high_scores);
 
     while(!doexit) {
+        if(SPEED < 10){
+            SPEED *= 1.0001;
+        } 
+        if(score >= 100 && SPEED < 13){
+            SPEED *= 1.00001;
+        }
         ALLEGRO_EVENT ev;
         al_wait_for_event(event_queue, &ev);
 
         if(ev.type == ALLEGRO_EVENT_TIMER) {
             if(key[0] && car.y > 0) {
-                car.y -= SPEED;
+                car.y -= SPEED*0.5;
             }
             if(key[1] && car.y < SCREEN_H - CAR_H) {
-                car.y += SPEED;
+                car.y += SPEED*0.5;
             }
             if(key[2] && car.x > 0) {
-                car.x -= SPEED;
+                car.x -= SPEED*0.5;
             }
             if(key[3] && car.x < SCREEN_W - CAR_W) {
-                car.x += SPEED;
+                car.x += SPEED*0.5;
             }
 
             update_obstacle();
@@ -198,6 +206,7 @@ int main(int argc, char **argv) {
                 score = 0;
                 init_car();
                 init_obstacle();
+                SPEED = 5;
             }
 
             redraw = true;
@@ -207,14 +216,26 @@ int main(int argc, char **argv) {
         }
         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
             switch(ev.keyboard.keycode) {
+                case ALLEGRO_KEY_W:
+                    key[0] = true;
+                    break;
                 case ALLEGRO_KEY_UP:
                     key[0] = true;
+                    break;
+                case ALLEGRO_KEY_S:
+                    key[1] = true;
                     break;
                 case ALLEGRO_KEY_DOWN:
                     key[1] = true;
                     break;
+                case ALLEGRO_KEY_A:
+                    key[2] = true;
+                    break;
                 case ALLEGRO_KEY_LEFT:
                     key[2] = true;
+                    break;
+                case ALLEGRO_KEY_D:
+                    key[3] = true;
                     break;
                 case ALLEGRO_KEY_RIGHT:
                     key[3] = true;
@@ -223,14 +244,26 @@ int main(int argc, char **argv) {
         }
         else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
             switch(ev.keyboard.keycode) {
+                case ALLEGRO_KEY_W:
+                    key[0] = false;
+                    break;
                 case ALLEGRO_KEY_UP:
                     key[0] = false;
+                    break;
+                case ALLEGRO_KEY_S:
+                    key[1] = false;
                     break;
                 case ALLEGRO_KEY_DOWN:
                     key[1] = false;
                     break;
+                case ALLEGRO_KEY_A:
+                    key[2] = false;
+                    break;
                 case ALLEGRO_KEY_LEFT:
                     key[2] = false;
+                    break;
+                case ALLEGRO_KEY_D:
+                    key[3] = false;
                     break;
                 case ALLEGRO_KEY_RIGHT:
                     key[3] = false;
@@ -250,6 +283,7 @@ int main(int argc, char **argv) {
 
             // Desenha a pontuação e os high scores
             al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 10, 0, "Score: %d", score);
+            al_draw_textf(font, al_map_rgb(255, 255, 255), 150, 10, 0, "SPEED: %.2f Km/h", SPEED*10);
 
             StackNode* current = high_scores;
             int y = 50;
