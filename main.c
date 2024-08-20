@@ -7,28 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "func.h"
 
-#define SCREEN_W 450
-#define SCREEN_H 800
-#define CAR_W 50
-#define CAR_H 100
-#define OBSTACLE_W 50
-#define OBSTACLE_H 100
+
 float SPEED = 5;
+int state = 0;
 
 
-typedef struct {
-    float x, y;
-} Car;
-
-typedef struct {
-    float x, y;
-} Obstacle;
-
-typedef struct StackNode {
-    int score;
-    struct StackNode* next;
-} StackNode;
+StackNode* high_scores = NULL;
 
 ALLEGRO_DISPLAY *display = NULL;
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
@@ -36,7 +22,6 @@ ALLEGRO_TIMER *timer = NULL;
 ALLEGRO_BITMAP *car_image = NULL;
 ALLEGRO_BITMAP *obstacle_image = NULL;
 ALLEGRO_BITMAP *background_image = NULL;
-ALLEGRO_FONT *font = NULL;
 
 bool key[4] = {false, false, false, false}; // [0] = up, [1] = down, [2] = left, [3] = right
 bool redraw = true;
@@ -45,42 +30,6 @@ bool doexit = false;
 Car car;
 Obstacle obstacle;
 int score = 0;
-
-StackNode* high_scores = NULL;
-
-void push_score(StackNode** stack, int score) {
-    StackNode* new_node = (StackNode*) malloc(sizeof(StackNode));
-    new_node->score = score;
-    new_node->next = *stack;
-    *stack = new_node;
-}
-
-void save_scores(StackNode* stack) {
-    FILE *file = fopen("high_scores.txt", "w");
-    if (file == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo para escrita.\n");
-        return;
-    }
-    StackNode* current = stack;
-    while (current != NULL) {
-        fprintf(file, "%d\n", current->score);
-        current = current->next;
-    }
-    fclose(file);
-}
-
-void load_scores(StackNode** stack) {
-    FILE *file = fopen("high_scores.txt", "r");
-    if (file == NULL) {
-        fprintf(stderr, "Erro ao abrir o arquivo para leitura.\n");
-        return;
-    }
-    int score;
-    while (fscanf(file, "%d", &score) != EOF) {
-        push_score(stack, score);
-    }
-    fclose(file);
-}
 
 void init_car() {
     car.x = (SCREEN_W / 2) - (CAR_W / 2);
@@ -117,6 +66,7 @@ int main(int argc, char **argv) {
 
     al_init_image_addon();
     al_init_primitives_addon();
+    al_install_mouse();
     al_install_keyboard();
     al_init_font_addon();
     al_init_ttf_addon();
@@ -175,15 +125,18 @@ int main(int argc, char **argv) {
     load_scores(&high_scores);
 
     while(!doexit) {
+        
+        ALLEGRO_EVENT ev;
+        al_wait_for_event(event_queue, &ev);
+        if(state==0){
+
+        }else if(state==1){
         if(SPEED < 10){
             SPEED *= 1.0001;
         } 
         if(score >= 100 && SPEED < 13){
             SPEED *= 1.00001;
         }
-        ALLEGRO_EVENT ev;
-        al_wait_for_event(event_queue, &ev);
-
         if(ev.type == ALLEGRO_EVENT_TIMER) {
             if(key[0] && car.y > 0) {
                 car.y -= SPEED*0.5;
@@ -207,6 +160,7 @@ int main(int argc, char **argv) {
                 init_car();
                 init_obstacle();
                 SPEED = 5;
+                state = 0;
             }
 
             redraw = true;
@@ -295,6 +249,7 @@ int main(int argc, char **argv) {
             }
 
             al_flip_display();
+        }
         }
     }
 
