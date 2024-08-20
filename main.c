@@ -16,16 +16,11 @@ int state = 0;
 
 StackNode* high_scores = NULL;
 
-ALLEGRO_DISPLAY *display = NULL;
-ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-ALLEGRO_TIMER *timer = NULL;
-ALLEGRO_BITMAP *car_image = NULL;
-ALLEGRO_BITMAP *obstacle_image = NULL;
-ALLEGRO_BITMAP *background_image = NULL;
-
 bool key[4] = {false, false, false, false}; // [0] = up, [1] = down, [2] = left, [3] = right
 bool redraw = true;
 bool doexit = false;
+int draw_shade=0;
+bool animation=0;
 
 Car car;
 Obstacle obstacle;
@@ -37,7 +32,7 @@ void init_car() {
 }
 
 void init_obstacle() {
-    obstacle.x = rand() % (SCREEN_W - OBSTACLE_W);
+    obstacle.x = 70 + rand() % (SCREEN_W - OBSTACLE_W - 140);
     obstacle.y = -OBSTACLE_H;
 }
 
@@ -70,6 +65,7 @@ int main(int argc, char **argv) {
     al_install_keyboard();
     al_init_font_addon();
     al_init_ttf_addon();
+    al_set_system_mouse_cursor(display, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 
     display = al_create_display(SCREEN_W, SCREEN_H);
     if(!display) {
@@ -92,8 +88,8 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    background_image = al_load_bitmap("background.png");
-    if(!background_image) {
+    background_image1 = al_load_bitmap("background1.png");
+    if(!background_image1) {
         fprintf(stderr, "Falha ao carregar a imagem de fundo!\n");
         al_destroy_bitmap(car_image);
         al_destroy_bitmap(obstacle_image);
@@ -106,10 +102,69 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Falha ao carregar a fonte!\n");
         al_destroy_bitmap(car_image);
         al_destroy_bitmap(obstacle_image);
-        al_destroy_bitmap(background_image);
+        al_destroy_bitmap(background_image1);
         al_destroy_display(display);
         return -1;
     }
+
+    button_play = al_load_bitmap("button_play.png");
+    if(!button_play){
+        al_destroy_bitmap(car_image);
+        al_destroy_bitmap(obstacle_image);
+        al_destroy_bitmap(background_image1);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return -1;
+    }
+    button_high = al_load_bitmap("button_high.png");
+    if(!button_high){
+        al_destroy_bitmap(button_play);
+        al_destroy_bitmap(car_image);
+        al_destroy_bitmap(obstacle_image);
+        al_destroy_bitmap(background_image1);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return -1;
+    }
+    button_exit = al_load_bitmap("button_exit.png");
+    if(!button_exit){
+        al_destroy_bitmap(button_play);
+        al_destroy_bitmap(button_high);
+        al_destroy_bitmap(car_image);
+        al_destroy_bitmap(obstacle_image);
+        al_destroy_bitmap(background_image1);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return -1;
+    }
+
+    shade = al_load_bitmap("shade.png");
+    if(!shade){
+        al_destroy_bitmap(button_play);
+        al_destroy_bitmap(button_high);
+        al_destroy_bitmap(button_exit);
+        al_destroy_bitmap(car_image);
+        al_destroy_bitmap(obstacle_image);
+        al_destroy_bitmap(background_image1);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return -1;
+    }
+
+    background_image2 = al_load_bitmap("background2.png");
+    if(!background_image2){
+        al_destroy_bitmap(shade);
+        al_destroy_bitmap(button_play);
+        al_destroy_bitmap(button_high);
+        al_destroy_bitmap(button_exit);
+        al_destroy_bitmap(car_image);
+        al_destroy_bitmap(obstacle_image);
+        al_destroy_bitmap(background_image1);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return -1;
+    }
+
 
     timer = al_create_timer(1.0 / 144);
     event_queue = al_create_event_queue();
@@ -117,6 +172,8 @@ int main(int argc, char **argv) {
     al_register_event_source(event_queue, al_get_display_event_source(display));
     al_register_event_source(event_queue, al_get_timer_event_source(timer));
     al_register_event_source(event_queue, al_get_keyboard_event_source());
+    al_register_event_source(event_queue, al_get_mouse_event_source());
+
 
     al_start_timer(timer);
 
@@ -129,25 +186,74 @@ int main(int argc, char **argv) {
         ALLEGRO_EVENT ev;
         al_wait_for_event(event_queue, &ev);
         if(state==0){
-
-        }else if(state==1){
-        if(SPEED < 10){
-            SPEED *= 1.0001;
-        } 
-        if(score >= 100 && SPEED < 13){
-            SPEED *= 1.00001;
+        if(ev.type == ALLEGRO_EVENT_TIMER){
+            redraw = 1;
+            for(int i=0;i<4;i++){
+                key[i]= false;
+            }
         }
+        else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+            doexit=true;
+        }else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
+            int mouse_x = ev.mouse.x;
+            int mouse_y = ev.mouse.y;
+            printf("x: %d , y: %dz\n", mouse_x,mouse_y);
+            if (mouse_x > 144 && mouse_x < 307 && mouse_y > 246 && mouse_y < 270) {
+
+                    state = 1;
+                    printf("FOIIIII");
+                }
+            if (mouse_x > 193 && mouse_x < 254 && mouse_y > 347 && mouse_y < 367) {
+
+                    state = 3;
+                    printf("FOIIIII");
+                }
+        }else if(ev.type == ALLEGRO_EVENT_MOUSE_AXES){
+            if(ev.mouse.x > 144 && ev.mouse.x < 307 && ev.mouse.y > 246 && ev.mouse.y <270){
+                draw_shade=1;
+            }else if(ev.mouse.x > 144 && ev.mouse.x < 307 && ev.mouse.y > 246 && ev.mouse.y <270){
+                draw_shade=1;
+            }else if(ev.mouse.x > 193 && ev.mouse.x < 254 && ev.mouse.y > 347 && ev.mouse.y <367){
+                draw_shade=3;
+            }else
+                draw_shade =0;
+        }
+        if(redraw && al_is_event_queue_empty(event_queue)){
+            redraw = 0;
+            al_clear_to_color(al_map_rgb(36, 56, 85));
+            if(draw_shade == 1){
+                al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 - 25, ALLEGRO_ALIGN_CENTRE);
+            }
+            if(draw_shade == 1){
+                al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 - 25, ALLEGRO_ALIGN_CENTRE);
+            }
+            if(draw_shade == 3){
+                al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 + 70, ALLEGRO_ALIGN_CENTRE);
+            }
+            al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, 150, ALLEGRO_ALIGN_CENTER, "-Car On TOP-");
+            al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, 250, ALLEGRO_ALIGN_CENTER, "Start Game");
+            al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, 300, ALLEGRO_ALIGN_CENTER, "High Scores");
+            al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, 350, ALLEGRO_ALIGN_CENTER, "Exit");
+            al_flip_display();
+        }
+        }else if(state==1){
         if(ev.type == ALLEGRO_EVENT_TIMER) {
+            if(SPEED < 10){
+                SPEED *= 1.0001;
+            } 
+            if(score >= 100 && SPEED < 13){
+                SPEED *= 1.00001;
+            }
             if(key[0] && car.y > 0) {
                 car.y -= SPEED*0.5;
             }
             if(key[1] && car.y < SCREEN_H - CAR_H) {
                 car.y += SPEED*0.5;
             }
-            if(key[2] && car.x > 0) {
+            if(key[2] && car.x > 70) {
                 car.x -= SPEED*0.5;
             }
-            if(key[3] && car.x < SCREEN_W - CAR_W) {
+            if(key[3] && car.x < SCREEN_W - CAR_W - 70) {
                 car.x += SPEED*0.5;
             }
 
@@ -166,7 +272,7 @@ int main(int argc, char **argv) {
             redraw = true;
         }
         else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            doexit = true;
+            doexit=true;
         }
         else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
             switch(ev.keyboard.keycode) {
@@ -229,7 +335,14 @@ int main(int argc, char **argv) {
             redraw = false;
 
             // Desenha a imagem de fundo
-            al_draw_bitmap(background_image, 0, 0, 0);
+            if(animation == 0){
+                al_draw_bitmap(background_image1, 0, 0, 0);
+                animation =1;
+            }else if(animation == 1){
+                al_draw_bitmap(background_image2, 0, 0, 0);
+                animation=0;
+            }
+            
 
             // Desenha o carro e o obstáculo
             al_draw_bitmap(car_image, car.x, car.y, 0);
@@ -250,6 +363,8 @@ int main(int argc, char **argv) {
 
             al_flip_display();
         }
+        }else if(state == 3){
+            doexit = true;
         }
     }
 
@@ -263,7 +378,8 @@ int main(int argc, char **argv) {
 
     al_destroy_bitmap(car_image);
     al_destroy_bitmap(obstacle_image);
-    al_destroy_bitmap(background_image);
+    al_destroy_bitmap(background_image1);
+    al_destroy_bitmap(background_image2);
     al_destroy_font(font);
     al_destroy_timer(timer);
     al_destroy_display(display);

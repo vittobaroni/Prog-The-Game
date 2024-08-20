@@ -11,17 +11,27 @@
 #define CAR_H 100
 #define OBSTACLE_W 50
 #define OBSTACLE_H 100
-#define PLAY_H 198
-#define PLAY_W 47
-#define HIGH_H 198
-#define HIGH_W 45
-#define EXIT_H 198
-#define EXIT_W 46
+#define PLAY_W 198
+#define PLAY_H 47
+#define HIGH_W 198
+#define HIGH_H 45
+#define EXIT_W 198
+#define EXIT_H 46
+#define SHADE_W 450
+#define SHADE_H 30
 
 static ALLEGRO_FONT *font = NULL;
 static ALLEGRO_BITMAP *button_play = NULL;
 static ALLEGRO_BITMAP *button_high = NULL;
 static ALLEGRO_BITMAP *button_exit = NULL;
+static ALLEGRO_BITMAP *shade = NULL;
+static ALLEGRO_DISPLAY *display = NULL;
+static ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+static ALLEGRO_TIMER *timer = NULL;
+static ALLEGRO_BITMAP *car_image = NULL;
+static ALLEGRO_BITMAP *obstacle_image = NULL;
+static ALLEGRO_BITMAP *background_image1 = NULL;
+static ALLEGRO_BITMAP *background_image2 = NULL;
 
 typedef struct {
     float x, y;
