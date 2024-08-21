@@ -40,7 +40,7 @@ void ordering_scores(StackNode* stack){
         aux2 = aux;
         while (aux2->next != NULL)
         {
-            if(aux2->score > aux2->next->score){
+            if(aux2->score < aux2->next->score){
                 int tmp = aux2->score;
                 printf("%d ",tmp);
                 aux2->score = aux2->next->score;

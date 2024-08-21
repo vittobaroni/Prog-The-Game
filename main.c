@@ -15,6 +15,7 @@ float SPEED = 5;
 int state = 0;
 
 
+
 StackNode* high_scores = NULL;
 
 bool key[4] = {false, false, false, false}; // [0] = up, [1] = down, [2] = left, [3] = right
@@ -26,6 +27,8 @@ bool animation=0;
 Car car;
 Obstacle obstacle;
 int score = 0;
+int score_draw=0;
+bool high_id=0;
 
 void init_car() {
     car.x = (SCREEN_W / 2) - (CAR_W / 2);
@@ -166,6 +169,22 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    trophy = al_load_bitmap("trophy.png");
+    if(!trophy){
+        al_destroy_bitmap(background_image2);
+        al_destroy_bitmap(shade);
+        al_destroy_bitmap(button_play);
+        al_destroy_bitmap(button_high);
+        al_destroy_bitmap(button_exit);
+        al_destroy_bitmap(car_image);
+        al_destroy_bitmap(obstacle_image);
+        al_destroy_bitmap(background_image1);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return -1;
+    }
+
+
 
     timer = al_create_timer(1.0 / 144);
     event_queue = al_create_event_queue();
@@ -261,14 +280,18 @@ int main(int argc, char **argv) {
             update_obstacle();
 
             if (check_collision(&car, &obstacle)) {
+                if(high_scores->score < score){
+                    high_id = true;
+                }
                 push_score(&high_scores, score);
                 ordering_scores(high_scores);
                 save_scores(high_scores);
+                score_draw = score;
                 score = 0;
                 init_car();
                 init_obstacle();
                 SPEED = 5;
-                state = 0;
+                state = 4;
             }
 
             redraw = true;
@@ -356,31 +379,35 @@ int main(int argc, char **argv) {
 
             StackNode* current = high_scores;
             ordering_scores(current);
-            int y = 50;
-            al_draw_text(font, al_map_rgb(255, 255, 255), 10, 30, 0, "High Scores:");
-            while (current != NULL) {
-                al_draw_textf(font, al_map_rgb(255, 255, 255), 10, y, 0, "%d", current->score);
-                current = current->next;
-                y += 20;
-            }
+            al_draw_text(font, al_map_rgb(255, 255, 255), 10, 30, 0, "High Score:");
+            al_draw_textf(font, al_map_rgb(255, 255, 255), 10, 50, 0, "%d", current->score);
 
             al_flip_display();
         }
         }else if(state == 2){
             if(ev.type == ALLEGRO_EVENT_TIMER){
                 redraw = 1;
-            }else if(ALLEGRO_EVENT_DISPLAY_CLOSE){
+                
+            }else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
                 doexit = true;
             }else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
             int mouse_x = ev.mouse.x;
             int mouse_y = ev.mouse.y;
-             if(mouse_x > 144 && mouse_x < 307 && mouse_y > 246 && mouse_y <270){
+            printf("x: %d , y: %dz\n", mouse_x,mouse_y);
+            if(mouse_x > 358 && mouse_x < 438 && mouse_y > 755 && mouse_y <784){
                 state = 0;
             }
-            }else if(ev.type == ALLEGRO_EVENT_MOUSE_AXES){
-               if(ev.mouse.x > 144 && ev.mouse.x < 307 && ev.mouse.y > 246 && ev.mouse.y <270){
-                draw_shade=1; 
+            if(mouse_x > 9 && mouse_x < 82 && mouse_y > 755 && mouse_y <784){
+                state = 3;
             }
+            
+            }else if(ev.type == ALLEGRO_EVENT_MOUSE_AXES){
+            if(ev.mouse.x > 358 && ev.mouse.x < 438 && ev.mouse.y > 755 && ev.mouse.y <784){
+                draw_shade=1; 
+            }else if(ev.mouse.x > 9 && ev.mouse.x < 82 && ev.mouse.y > 755 && ev.mouse.y <784){
+                draw_shade=2; 
+            }else
+                draw_shade=0;
             }
             
             if(redraw && al_is_event_queue_empty(event_queue)){
@@ -388,16 +415,58 @@ int main(int argc, char **argv) {
 
                 al_clear_to_color(al_map_rgb(36, 56, 85));
                 if(draw_shade == 1){
-                al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 - 25, ALLEGRO_ALIGN_CENTRE);
+                al_draw_bitmap(shade,350, 750, ALLEGRO_ALIGN_LEFT);
+                }
+                if(draw_shade == 2){
+                al_draw_bitmap(shade,-365, 750, ALLEGRO_ALIGN_CENTER);
+                }
+                StackNode* current = high_scores;
+                ordering_scores(current);
+                int y = 200;
+                int cont = 1;
+                while (current != NULL) {
+                al_draw_textf(font, al_map_rgb(255, 255, 255), SCREEN_W/2, y, ALLEGRO_ALIGN_CENTRE, "%d. %d",cont, current->score);
+                current = current->next;
+                cont++;
+                y += 30;
                 }
                 al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, 150, ALLEGRO_ALIGN_CENTER, "-HIGH SOCORES-");
                 al_draw_text(font, al_map_rgb(255, 255, 255), 20 , 760, ALLEGRO_ALIGN_LEFT, "Exit");
-                al_draw_text(font, al_map_rgb(255, 255, 255), 450 , 760, ALLEGRO_ALIGN_LEFT, "");
+                al_draw_text(font, al_map_rgb(255, 255, 255), 430, 760, ALLEGRO_ALIGN_RIGHT, "Back");
+                al_draw_bitmap(trophy, SCREEN_W/2 +40, 190, ALLEGRO_ALIGN_CENTER);
                 al_flip_display();
             }
 
         }else if(state == 3){
             doexit = true;
+        }else if(state == 4){
+            if(ev.type == ALLEGRO_EVENT_TIMER){
+                redraw = 1;
+            }else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+                doexit = true;
+            }else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
+                int mouse_x = ev.mouse.x;
+                int mouse_y = ev.mouse.y;
+                printf("x: %d , y: %dz\n", mouse_x,mouse_y);
+                if(mouse_x > 358 && mouse_x < 438 && mouse_y > 755 && mouse_y <784){
+                state = 0;
+            }
+            }else if (ev.type == ALLEGRO_EVENT_MOUSE_AXES){
+                if(ev.mouse.x > 358 && ev.mouse.x < 438 && ev.mouse.y > 755 && ev.mouse.y <784){
+                draw_shade=1; 
+                }
+            }
+            if(redraw && al_is_event_queue_empty(event_queue)){
+                redraw = 0;
+                printf("DESENHOUUUUU!!!");
+                al_clear_to_color(al_map_rgb(36, 56, 85));
+                al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, 150, ALLEGRO_ALIGN_CENTER, "-GAME OVER-");
+                al_draw_text(font, al_map_rgb(255, 255, 255), 20 , 760, ALLEGRO_ALIGN_LEFT, "Play again");
+                al_draw_text(font, al_map_rgb(255, 255, 255), 430, 760, ALLEGRO_ALIGN_RIGHT, "Main menu");
+                if(high_id == false){
+
+                }
+            }
         }
     }
 

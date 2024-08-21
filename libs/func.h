@@ -19,13 +19,17 @@
 #define EXIT_H 46
 #define SHADE_W 450
 #define SHADE_H 30
+#define TROPHY_W 20
+#define TROPHY_H 36
 #define MAX_STACK 10
+
 
 static ALLEGRO_FONT *font = NULL;
 static ALLEGRO_BITMAP *button_play = NULL;
 static ALLEGRO_BITMAP *button_high = NULL;
 static ALLEGRO_BITMAP *button_exit = NULL;
 static ALLEGRO_BITMAP *shade = NULL;
+static ALLEGRO_BITMAP *trophy = NULL;
 static ALLEGRO_DISPLAY *display = NULL;
 static ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 static ALLEGRO_TIMER *timer = NULL;
