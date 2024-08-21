@@ -33,6 +33,9 @@ void push_score(StackNode** stack, int score) {
 }
 
 void ordering_scores(StackNode* stack){
+    if(stack == NULL){
+        return;
+    }
     StackNode* aux = malloc(sizeof(StackNode));
     aux = stack;
     while(aux->next != NULL){

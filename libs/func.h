@@ -29,7 +29,8 @@ static ALLEGRO_BITMAP *button_play = NULL;
 static ALLEGRO_BITMAP *button_high = NULL;
 static ALLEGRO_BITMAP *button_exit = NULL;
 static ALLEGRO_BITMAP *shade = NULL;
-static ALLEGRO_BITMAP *trophy = NULL;
+static ALLEGRO_BITMAP *over = NULL;
+static ALLEGRO_BITMAP *new_h = NULL;
 static ALLEGRO_DISPLAY *display = NULL;
 static ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 static ALLEGRO_TIMER *timer = NULL;
@@ -37,6 +38,11 @@ static ALLEGRO_BITMAP *car_image = NULL;
 static ALLEGRO_BITMAP *obstacle_image = NULL;
 static ALLEGRO_BITMAP *background_image1 = NULL;
 static ALLEGRO_BITMAP *background_image2 = NULL;
+static ALLEGRO_BITMAP *ferrari = NULL;
+static ALLEGRO_BITMAP *trophy_gold = NULL;
+static ALLEGRO_BITMAP *trophy_silver = NULL;
+static ALLEGRO_BITMAP *trophy_bronze = NULL;
+
 
 
 
