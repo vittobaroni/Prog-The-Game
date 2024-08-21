@@ -55,4 +55,4 @@ static int cont=0;
 void push_score(StackNode** stack, int score);
 void save_scores(StackNode* stack);
 void load_scores(StackNode** stack);
-void ordering_scores(StackNode** stack);
+void ordering_scores(StackNode* stack);

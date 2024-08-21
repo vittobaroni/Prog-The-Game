@@ -181,6 +181,7 @@ int main(int argc, char **argv) {
     init_car();
     init_obstacle();
     load_scores(&high_scores);
+    ordering_scores(high_scores);
 
     while(!doexit) {
         
@@ -200,20 +201,19 @@ int main(int argc, char **argv) {
             int mouse_y = ev.mouse.y;
             printf("x: %d , y: %dz\n", mouse_x,mouse_y);
             if (mouse_x > 144 && mouse_x < 307 && mouse_y > 246 && mouse_y < 270) {
-
                     state = 1;
-                    printf("FOIIIII");
-                }
+            }
+            if (mouse_x > 143 && mouse_x < 306 && mouse_y > 299 && mouse_y < 317) {
+                    state = 2;
+            }
             if (mouse_x > 193 && mouse_x < 254 && mouse_y > 347 && mouse_y < 367) {
-
                     state = 3;
-                    printf("FOIIIII");
-                }
+            }
         }else if(ev.type == ALLEGRO_EVENT_MOUSE_AXES){
             if(ev.mouse.x > 144 && ev.mouse.x < 307 && ev.mouse.y > 246 && ev.mouse.y <270){
                 draw_shade=1;
-            }else if(ev.mouse.x > 144 && ev.mouse.x < 307 && ev.mouse.y > 246 && ev.mouse.y <270){
-                draw_shade=1;
+            }else if(ev.mouse.x > 143 && ev.mouse.x < 306 && ev.mouse.y > 299 && ev.mouse.y <317){
+                draw_shade=2;
             }else if(ev.mouse.x > 193 && ev.mouse.x < 254 && ev.mouse.y > 347 && ev.mouse.y <367){
                 draw_shade=3;
             }else
@@ -225,8 +225,8 @@ int main(int argc, char **argv) {
             if(draw_shade == 1){
                 al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 - 25, ALLEGRO_ALIGN_CENTRE);
             }
-            if(draw_shade == 1){
-                al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 - 25, ALLEGRO_ALIGN_CENTRE);
+            if(draw_shade == 2){
+                al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 + 25, ALLEGRO_ALIGN_CENTRE);
             }
             if(draw_shade == 3){
                 al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 + 70, ALLEGRO_ALIGN_CENTRE);
@@ -262,6 +262,7 @@ int main(int argc, char **argv) {
 
             if (check_collision(&car, &obstacle)) {
                 push_score(&high_scores, score);
+                ordering_scores(high_scores);
                 save_scores(high_scores);
                 score = 0;
                 init_car();
@@ -354,6 +355,7 @@ int main(int argc, char **argv) {
             al_draw_textf(font, al_map_rgb(255, 255, 255), 150, 10, 0, "SPEED: %.2f Km/h", SPEED*10);
 
             StackNode* current = high_scores;
+            ordering_scores(current);
             int y = 50;
             al_draw_text(font, al_map_rgb(255, 255, 255), 10, 30, 0, "High Scores:");
             while (current != NULL) {
@@ -364,6 +366,36 @@ int main(int argc, char **argv) {
 
             al_flip_display();
         }
+        }else if(state == 2){
+            if(ev.type == ALLEGRO_EVENT_TIMER){
+                redraw = 1;
+            }else if(ALLEGRO_EVENT_DISPLAY_CLOSE){
+                doexit = true;
+            }else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
+            int mouse_x = ev.mouse.x;
+            int mouse_y = ev.mouse.y;
+             if(mouse_x > 144 && mouse_x < 307 && mouse_y > 246 && mouse_y <270){
+                state = 0;
+            }
+            }else if(ev.type == ALLEGRO_EVENT_MOUSE_AXES){
+               if(ev.mouse.x > 144 && ev.mouse.x < 307 && ev.mouse.y > 246 && ev.mouse.y <270){
+                draw_shade=1; 
+            }
+            }
+            
+            if(redraw && al_is_event_queue_empty(event_queue)){
+                redraw =0;
+
+                al_clear_to_color(al_map_rgb(36, 56, 85));
+                if(draw_shade == 1){
+                al_draw_bitmap(shade,(SCREEN_W/2)- (SHADE_W/2), SCREEN_H/3 - 25, ALLEGRO_ALIGN_CENTRE);
+                }
+                al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, 150, ALLEGRO_ALIGN_CENTER, "-HIGH SOCORES-");
+                al_draw_text(font, al_map_rgb(255, 255, 255), 20 , 760, ALLEGRO_ALIGN_LEFT, "Exit");
+                al_draw_text(font, al_map_rgb(255, 255, 255), 450 , 760, ALLEGRO_ALIGN_LEFT, "");
+                al_flip_display();
+            }
+
         }else if(state == 3){
             doexit = true;
         }

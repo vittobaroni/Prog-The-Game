@@ -32,22 +32,21 @@ void push_score(StackNode** stack, int score) {
     }
 }
 
-void ordering_scores(StackNode** stack){
+void ordering_scores(StackNode* stack){
     StackNode* aux = malloc(sizeof(StackNode));
-    aux = *stack;
-    while (aux != NULL){
+    aux = stack;
+    while(aux->next != NULL){
         StackNode* aux2 = malloc(sizeof(StackNode));
-        aux2=aux;
-        while (aux2 !=NULL)
+        aux2 = aux;
+        while (aux2->next != NULL)
         {
-            int tmp = aux2->next->score;
-            if(aux2->score < tmp){
-                int ax = aux2->score;
-                aux2->score = tmp;
-                aux2->next->score = ax;
+            if(aux2->score > aux2->next->score){
+                int tmp = aux2->score;
+                printf("%d ",tmp);
+                aux2->score = aux2->next->score;
+                aux2->next->score = tmp;
             }
             aux2 = aux2->next;
-
         }
         aux = aux->next;
     }
