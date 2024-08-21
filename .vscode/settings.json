@@ -3,6 +3,7 @@
         "score.h": "c",
         "allegro_primitives.h": "c",
         "allegro_font.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "allegro_ttf.h": "c"
     }
 }

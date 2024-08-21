@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include "func.h"
 
-
-void search_score(StackNode* stack, int score){
+//Determina qual será o valor a ser trocado em caso de lista cheia
+void search_score(StackNode* high_scores, int score){
     StackNode* aux = malloc(sizeof(StackNode));
-    aux = stack;
+    aux = high_scores;
     int carry=score;
     int ax=carry;
     if(aux != NULL){
@@ -18,26 +18,26 @@ void search_score(StackNode* stack, int score){
     
     
 }
-
-void push_score(StackNode** stack, int score) {
+// Adiciona um novo score a lista
+void push_score(StackNode** high_scores, int score) {
     StackNode* new_node = malloc(sizeof(StackNode));
     if(cont >= MAX_STACK){
-        search_score(*stack,score);
+        search_score(*high_scores,score);
     }else{
     new_node->score = score;
-    new_node->next = *stack;
+    new_node->next = *high_scores;
     new_node->prev = NULL;
-    *stack = new_node;
+    *high_scores = new_node;
     cont++;
     }
 }
-
-void ordering_scores(StackNode* stack){
-    if(stack == NULL){
+// Ordena a lista
+void ordering_scores(StackNode* high_scores){
+    if(high_scores == NULL){
         return;
     }
     StackNode* aux = malloc(sizeof(StackNode));
-    aux = stack;
+    aux = high_scores;
     while(aux->next != NULL){
         StackNode* aux2 = malloc(sizeof(StackNode));
         aux2 = aux;
@@ -45,7 +45,6 @@ void ordering_scores(StackNode* stack){
         {
             if(aux2->score < aux2->next->score){
                 int tmp = aux2->score;
-                printf("%d ",tmp);
                 aux2->score = aux2->next->score;
                 aux2->next->score = tmp;
             }
@@ -55,22 +54,22 @@ void ordering_scores(StackNode* stack){
     }
     
 }
-
-void save_scores(StackNode* stack) {
+//Salva a lista no txt "high_scores.txt"
+void save_scores(StackNode* high_scores) {
     FILE *file = fopen("high_scores.txt", "w");
     if (file == NULL) {
         fprintf(stderr, "Erro ao abrir o arquivo para escrita.\n");
         return;
     }
-    StackNode* current = stack;
+    StackNode* current = high_scores;
     while (current != NULL) {
         fprintf(file, "%d\n", current->score);
         current = current->next;
     }
     fclose(file);
 }
-
-void load_scores(StackNode** stack) {
+// Le os valores de "high_scores.txt" e implementa a lista high_socres
+void load_scores(StackNode** high_scores) {
     FILE *file = fopen("high_scores.txt", "r");
     if (file == NULL) {
         fprintf(stderr, "Erro ao abrir o arquivo para leitura.\n");
@@ -78,7 +77,7 @@ void load_scores(StackNode** stack) {
     }
     int score;
     while (fscanf(file, "%d", &score) != EOF) {
-        push_score(stack, score);
+        push_score(high_scores, score);
     }
     fclose(file);
 }
