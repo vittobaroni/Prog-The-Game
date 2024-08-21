@@ -2,11 +2,56 @@
 #include <stdlib.h>
 #include "func.h"
 
+
+void search_score(StackNode* stack, int score){
+    StackNode* aux = malloc(sizeof(StackNode));
+    aux = stack;
+    int carry=score;
+    int ax=carry;
+    if(aux != NULL){
+        if(carry >= aux->score){
+           carry = aux->score;
+           aux->score = ax;
+        }
+        search_score(aux->next, carry);
+    }
+    
+    
+}
+
 void push_score(StackNode** stack, int score) {
-    StackNode* new_node = (StackNode*) malloc(sizeof(StackNode));
+    StackNode* new_node = malloc(sizeof(StackNode));
+    if(cont >= MAX_STACK){
+        search_score(*stack,score);
+    }else{
     new_node->score = score;
     new_node->next = *stack;
+    new_node->prev = NULL;
     *stack = new_node;
+    cont++;
+    }
+}
+
+void ordering_scores(StackNode** stack){
+    StackNode* aux = malloc(sizeof(StackNode));
+    aux = *stack;
+    while (aux != NULL){
+        StackNode* aux2 = malloc(sizeof(StackNode));
+        aux2=aux;
+        while (aux2 !=NULL)
+        {
+            int tmp = aux2->next->score;
+            if(aux2->score < tmp){
+                int ax = aux2->score;
+                aux2->score = tmp;
+                aux2->next->score = ax;
+            }
+            aux2 = aux2->next;
+
+        }
+        aux = aux->next;
+    }
+    
 }
 
 void save_scores(StackNode* stack) {

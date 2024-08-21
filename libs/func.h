@@ -19,6 +19,7 @@
 #define EXIT_H 46
 #define SHADE_W 450
 #define SHADE_H 30
+#define MAX_STACK 10
 
 static ALLEGRO_FONT *font = NULL;
 static ALLEGRO_BITMAP *button_play = NULL;
@@ -33,6 +34,8 @@ static ALLEGRO_BITMAP *obstacle_image = NULL;
 static ALLEGRO_BITMAP *background_image1 = NULL;
 static ALLEGRO_BITMAP *background_image2 = NULL;
 
+
+
 typedef struct {
     float x, y;
 } Car;
@@ -44,11 +47,12 @@ typedef struct {
 typedef struct StackNode {
     int score;
     struct StackNode* next;
+    struct StackNode* prev;
 } StackNode;
 
+static int cont=0;
 
 void push_score(StackNode** stack, int score);
 void save_scores(StackNode* stack);
 void load_scores(StackNode** stack);
-
-void init_car();
+void ordering_scores(StackNode** stack);
