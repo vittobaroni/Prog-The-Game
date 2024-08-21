@@ -93,7 +93,8 @@ int main(int argc, char **argv) {
     }
 
     background_image1 = al_load_bitmap("background1.png");
-    if(!background_image1) {
+    background_image2 = al_load_bitmap("background2.png");
+    if(!background_image1||!background_image2) {
         fprintf(stderr, "Falha ao carregar a imagem de fundo!\n");
         al_destroy_bitmap(car_image);
         al_destroy_bitmap(obstacle_image);
@@ -112,70 +113,25 @@ int main(int argc, char **argv) {
     }
 
     button_play = al_load_bitmap("button_play.png");
-    if(!button_play){
-        al_destroy_bitmap(car_image);
-        al_destroy_bitmap(obstacle_image);
-        al_destroy_bitmap(background_image1);
-        al_destroy_font(font);
-        al_destroy_display(display);
-        return -1;
-    }
     button_high = al_load_bitmap("button_high.png");
-    if(!button_high){
-        al_destroy_bitmap(button_play);
-        al_destroy_bitmap(car_image);
-        al_destroy_bitmap(obstacle_image);
-        al_destroy_bitmap(background_image1);
-        al_destroy_font(font);
-        al_destroy_display(display);
-        return -1;
-    }
     button_exit = al_load_bitmap("button_exit.png");
-    if(!button_exit){
-        al_destroy_bitmap(button_play);
-        al_destroy_bitmap(button_high);
-        al_destroy_bitmap(car_image);
-        al_destroy_bitmap(obstacle_image);
-        al_destroy_bitmap(background_image1);
-        al_destroy_font(font);
-        al_destroy_display(display);
-        return -1;
-    }
-
     shade = al_load_bitmap("shade.png");
-    if(!shade){
-        al_destroy_bitmap(button_play);
-        al_destroy_bitmap(button_high);
-        al_destroy_bitmap(button_exit);
-        al_destroy_bitmap(car_image);
-        al_destroy_bitmap(obstacle_image);
-        al_destroy_bitmap(background_image1);
-        al_destroy_font(font);
-        al_destroy_display(display);
-        return -1;
-    }
-
-    background_image2 = al_load_bitmap("background2.png");
-    if(!background_image2){
-        al_destroy_bitmap(shade);
-        al_destroy_bitmap(button_play);
-        al_destroy_bitmap(button_high);
-        al_destroy_bitmap(button_exit);
-        al_destroy_bitmap(car_image);
-        al_destroy_bitmap(obstacle_image);
-        al_destroy_bitmap(background_image1);
-        al_destroy_font(font);
-        al_destroy_display(display);
-        return -1;
-    }
-
     trophy_gold = al_load_bitmap("trophy_gold.png");
     trophy_silver = al_load_bitmap("trophy_silver.png");
     trophy_bronze = al_load_bitmap("trophy_bronze.png");
-    
     over = al_load_bitmap("over.png");
     new_h = al_load_bitmap("new_h.png");
     ferrari = al_load_bitmap("ferrari.png");
+    if(!button_play||!button_high||!button_exit||!shade||!trophy_gold||!trophy_silver||!trophy_bronze||!over||!new_h||!ferrari){
+        al_destroy_bitmap(shade);
+        al_destroy_bitmap(car_image);
+        al_destroy_bitmap(obstacle_image);
+        al_destroy_bitmap(background_image1);
+        al_destroy_font(font);
+        al_destroy_display(display);
+        return -1;
+    }
+    
 
 
     timer = al_create_timer(1.0 / 144);
@@ -454,13 +410,13 @@ int main(int argc, char **argv) {
             if (mouse_x > 246 && mouse_x < 391 && mouse_y > 299 && mouse_y < 321) {
                     state = 0;
             }
-            if (mouse_x > 53 && mouse_x < 208 && mouse_y > 295 && mouse_y < 321) {
+            if (mouse_x > 53 && mouse_x < 208 && mouse_y > 299 && mouse_y < 321) {
                     state = 1;
             }
         }else if(ev.type == ALLEGRO_EVENT_MOUSE_AXES){
-            if(ev.mouse.x > 144 && ev.mouse.x < 307 && ev.mouse.y > 246 && ev.mouse.y <270){
+            if(ev.mouse.x > 246 && ev.mouse.x < 391 && ev.mouse.y > 299 && ev.mouse.y <321){
                 draw_shade=1;
-            }else if(ev.mouse.x > 143 && ev.mouse.x < 306 && ev.mouse.y > 299 && ev.mouse.y <317){
+            }else if(ev.mouse.x > 53 && ev.mouse.x < 208 && ev.mouse.y > 299 && ev.mouse.y <321){
                 draw_shade=2;
             }else
                 draw_shade =0;
@@ -468,18 +424,24 @@ int main(int argc, char **argv) {
         if(redraw && al_is_event_queue_empty(event_queue)){
             redraw = 0;
             al_clear_to_color(al_map_rgb(36, 56, 85));
+            if(draw_shade == 1){
+                al_draw_bitmap(shade,230, 290, ALLEGRO_ALIGN_LEFT);
+            }
+            if(draw_shade == 2){
+                al_draw_bitmap(shade,-230, 290, ALLEGRO_ALIGN_CENTER);
+            }
             al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2, 150, ALLEGRO_ALIGN_CENTER, "-GAME OVER-");
-                al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W/2 -20 ,SCREEN_H/2- 100, ALLEGRO_ALIGN_RIGHT, "Play again");
-                al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W/2 + 30, SCREEN_H/2-100, ALLEGRO_ALIGN_LEFT, "Main menu");
-                if(high_id == false){
-                    al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2 -15, 200, ALLEGRO_ALIGN_CENTER, "Score:");
-                    al_draw_textf(font, al_map_rgb(255, 255, 255), SCREEN_W/2 + 45, 200, ALLEGRO_ALIGN_LEFT, "%d",score_draw);
-                    al_draw_bitmap(over, SCREEN_W/2 -165, SCREEN_H/2, ALLEGRO_ALIGN_CENTER);
-                }else if(high_id == true){
-                    al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2 -10, 200, ALLEGRO_ALIGN_CENTER, "New High Score:");
-                    al_draw_textf(font, al_map_rgb(255, 255, 255), SCREEN_W/2 + 110, 200, ALLEGRO_ALIGN_LEFT, "%d",score_draw);
-                    al_draw_bitmap(new_h, SCREEN_W/2 -200, SCREEN_H/2, ALLEGRO_ALIGN_CENTER);
-                }
+            al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W/2 -20 ,SCREEN_H/2- 100, ALLEGRO_ALIGN_RIGHT, "Play again");
+            al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W/2 + 30, SCREEN_H/2-100, ALLEGRO_ALIGN_LEFT, "Main menu");
+            if(high_id == false){
+                al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2 -15, 200, ALLEGRO_ALIGN_CENTER, "Score:");
+                al_draw_textf(font, al_map_rgb(255, 255, 255), SCREEN_W/2 + 45, 200, ALLEGRO_ALIGN_LEFT, "%d",score_draw);
+                al_draw_bitmap(over, SCREEN_W/2 -165, SCREEN_H/2, ALLEGRO_ALIGN_CENTER);
+            }else if(high_id == true){
+                al_draw_text(font, al_map_rgb(255, 255, 255), SCREEN_W / 2 -10, 200, ALLEGRO_ALIGN_CENTER, "New High Score:");
+                al_draw_textf(font, al_map_rgb(255, 255, 255), SCREEN_W/2 + 110, 200, ALLEGRO_ALIGN_LEFT, "%d",score_draw);
+                al_draw_bitmap(new_h, SCREEN_W/2 -200, SCREEN_H/2, ALLEGRO_ALIGN_CENTER);
+            }
             al_flip_display();
         }
         }
@@ -497,6 +459,13 @@ int main(int argc, char **argv) {
     al_destroy_bitmap(obstacle_image);
     al_destroy_bitmap(background_image1);
     al_destroy_bitmap(background_image2);
+    al_destroy_bitmap(button_play);
+    al_destroy_bitmap(button_high);
+    al_destroy_bitmap(button_exit);
+    al_destroy_bitmap(shade);
+    al_destroy_bitmap(trophy_gold);
+    al_destroy_bitmap(trophy_silver);
+    al_destroy_bitmap(trophy_bronze);
     al_destroy_font(font);
     al_destroy_timer(timer);
     al_destroy_display(display);
